@@ -1,0 +1,16 @@
+symvol.cache()
+
+symvol.persist(org.apache.spark.storage.StorageLevel.MEMORY_ONLY)
+symvol.persist(org.apache.spark.storage.StorageLevel.DISK_ONLY)
+symvol.persist(org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK)
+
+symvol.unpersist()
+
+--caching symvol
+
+val stocks = sc.textFile("/user/osboxes/stocks-dataset")
+val splits = stocks.map(record => record.split(","))
+val symvol = splits.map(arr => (arr(1), arr(7).toInt))
+symvol.cache()
+val maxvol = symvol.reduceByKey((vol1, vol2) => Math.max(vol1, vol2))
+maxvol.collect().foreach(println)
